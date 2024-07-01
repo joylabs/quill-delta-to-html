@@ -927,22 +927,25 @@ var QuillDeltaToHtmlConverter = (function () {
                 : html;
         return html;
     };
-    QuillDeltaToHtmlConverter.prototype._renderList = function (list) {
+    QuillDeltaToHtmlConverter.prototype._renderList = function (list, nested) {
         var _this = this;
+        if (nested === void 0) { nested = false; }
         var firstItem = list.items[0];
-        return (funcs_html_1.makeStartTag(this._getListTag(firstItem.item.op)) +
+        return ((!nested ? funcs_html_1.makeStartTag(this._getListTag(firstItem.item.op)) : '') +
             list.items.map(function (li) { return _this._renderListItem(li); }).join('') +
-            funcs_html_1.makeEndTag(this._getListTag(firstItem.item.op)));
+            (!nested ? funcs_html_1.makeEndTag(this._getListTag(firstItem.item.op)) : ''));
     };
     QuillDeltaToHtmlConverter.prototype._renderListItem = function (li) {
-        li.item.op.attributes.indent = 0;
+        li.item.op.attributes.indent = li.item.op.attributes.indent
+            ? li.item.op.attributes.indent
+            : 0;
         var converter = new OpToHtmlConverter_1.OpToHtmlConverter(li.item.op, this.converterOptions);
         var parts = converter.getHtmlParts();
         var liElementsHtml = this._renderInlines(li.item.ops, false);
         return (parts.openingTag +
             liElementsHtml +
-            (li.innerList ? this._renderList(li.innerList) : '') +
-            parts.closingTag);
+            parts.closingTag +
+            (li.innerList ? this._renderList(li.innerList, true) : ''));
     };
     QuillDeltaToHtmlConverter.prototype._renderTable = function (table) {
         var _this = this;

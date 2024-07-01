@@ -35,7 +35,7 @@ declare class QuillDeltaToHtmlConverter {
     group: TDataGroup,
     myRenderFn: () => string
   ): string;
-  _renderList(list: ListGroup): string;
+  _renderList(list: ListGroup, nested?: boolean): string;
   _renderListItem(li: ListItem): string;
   _renderTable(table: TableGroup): string;
   _renderTableRow(row: TableRow): string;

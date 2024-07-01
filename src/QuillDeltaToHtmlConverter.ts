@@ -196,27 +196,27 @@ class QuillDeltaToHtmlConverter {
     return html;
   }
 
-  _renderList(list: ListGroup): string {
+  _renderList(list: ListGroup, nested = false): string {
     var firstItem = list.items[0];
     return (
-      makeStartTag(this._getListTag(firstItem.item.op)) +
+      (!nested ? makeStartTag(this._getListTag(firstItem.item.op)) : '') +
       list.items.map((li: ListItem) => this._renderListItem(li)).join('') +
-      makeEndTag(this._getListTag(firstItem.item.op))
+      (!nested ? makeEndTag(this._getListTag(firstItem.item.op)) : '')
     );
   }
 
   _renderListItem(li: ListItem): string {
-    //if (!isOuterMost) {
-    li.item.op.attributes.indent = 0;
-    //}
+    li.item.op.attributes.indent = li.item.op.attributes.indent
+      ? li.item.op.attributes.indent
+      : 0;
     var converter = new OpToHtmlConverter(li.item.op, this.converterOptions);
     var parts = converter.getHtmlParts();
     var liElementsHtml = this._renderInlines(li.item.ops, false);
     return (
       parts.openingTag +
       liElementsHtml +
-      (li.innerList ? this._renderList(li.innerList) : '') +
-      parts.closingTag
+      parts.closingTag +
+      (li.innerList ? this._renderList(li.innerList, true) : '')
     );
   }
 

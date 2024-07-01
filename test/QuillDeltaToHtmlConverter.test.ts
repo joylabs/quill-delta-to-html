@@ -231,10 +231,36 @@ describe('QuillDeltaToHtmlConverter', function () {
           '<ul>',
           '<li data-checked="true">hello</li>',
           '<li data-checked="false">there</li>',
-          '<li data-checked="true">man',
-          '<ul><li data-checked="false">not done</li></ul>',
-          '</li>',
+          '<li data-checked="true">man</li>',
+          '<li class="ql-indent-1" data-checked="false">not done</li>',
           '</ul>',
+        ].join('')
+      );
+    });
+
+    it('should create ordered lists', function () {
+      var ops4 = [
+        { insert: 'hello' },
+        { insert: '\n', attributes: { list: 'ordered' } },
+        { insert: 'there' },
+        { insert: '\n', attributes: { list: 'ordered', indent: 1 } },
+        { insert: 'man' },
+        { insert: '\n', attributes: { list: 'ordered', indent: 2 } },
+        { insert: 'not done' },
+        { insert: '\n', attributes: { indent: 3, list: 'ordered' } },
+      ];
+
+      var qdc = new QuillDeltaToHtmlConverter(ops4);
+      var html = qdc.convert();
+      assert.equal(
+        html,
+        [
+          '<ol>',
+          '<li>hello</li>',
+          '<li class="ql-indent-1">there</li>',
+          '<li class="ql-indent-2">man</li>',
+          '<li class="ql-indent-3">not done</li>',
+          '</ol>',
         ].join('')
       );
     });
@@ -967,7 +993,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           } else if (groupType === GroupType.Block) {
             assert.ok(html.indexOf('<blockquote') > -1);
           } else {
-            assert.ok(html.indexOf('list item 1<ul><li') > -1);
+            assert.ok(html.indexOf('list item 1</li>') > -1);
           }
           status.x++;
           return html;
